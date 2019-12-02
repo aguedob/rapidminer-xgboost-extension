@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="resources"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="src" path="src_generated"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/Rapidminer"/>
+	<classpathentry kind="lib" path="/Users/guerrero/Repos/rapidminer-xgboost-extension/lib/xgboost4j-0.90.jar"/>
+	<classpathentry kind="lib" path="/Users/guerrero/Repos/rapidminer-xgboost-extension/lib/kryo-4.0.0.jar"/>
+	<classpathentry kind="output" path="build"/>
+</classpath>
