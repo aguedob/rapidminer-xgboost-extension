@@ -16,6 +16,7 @@ import com.rapidminer.operator.OperatorDescription;
 import com.rapidminer.operator.OperatorException;
 import com.rapidminer.operator.learner.AbstractLearner;
 import com.rapidminer.operator.learner.functions.XGBRegressionMethod.XGBRegressionResult;
+import com.rapidminer.operator.ports.InputPort;
 import com.rapidminer.operator.learner.functions.XGBRegressionModel;
 
 import ml.dmlc.xgboost4j.java.Booster;
@@ -35,6 +36,8 @@ import ml.dmlc.xgboost4j.java.XGBoost;
  */
 public class GradientBoostLearner extends AbstractLearner {
 	
+	
+	private final InputPort testSetInput = getInputPorts().createPort("test set");
 	
 	/**
      * The parameter name for &quot;The feature selection method used during
@@ -71,6 +74,9 @@ public class GradientBoostLearner extends AbstractLearner {
 
 	@Override
 	public Model learn(ExampleSet exampleSet) throws OperatorException {
+		
+		
+		ExampleSet testSet = testSetInput.getData(ExampleSet.class);
 		
 		// initializing data and parameter values.
         Attribute label = exampleSet.getAttributes().getLabel();
@@ -132,16 +138,35 @@ public class GradientBoostLearner extends AbstractLearner {
 			labels[j++] = (float) example.getLabel();
 		}
 		
+		int nrowT = testSet.size();
+		int ncolT = testSet.getAttributes().size();
+		
+		
+        float[] labelsT = new float[nrowT];
+
+        
+        float[] dataT = new float[nrowT*ncolT];
+        
+        int kT = 0,jT=0;
+		for (Example example : testSet) {			
+		   
+			for (Attribute attr: example.getAttributes()) {
+				dataT[kT++] = (float) example.getValue(attr);
+			}
+			//System.out.print("   $" + example.getLabel() + "$   ");
+			labelsT[jT++] = (float) example.getLabel();
+		}
+		
 		
 		
 		
 		float missing = 0.0f;
 		try {
 			final DMatrix trainMat = new DMatrix(data, nrow, ncol, missing);
-			final DMatrix testMat = new DMatrix(data, nrow, ncol, missing);
+			final DMatrix testMat = new DMatrix(dataT, nrowT, ncolT, missing);
 			
 			trainMat.setLabel(labels);
-			testMat.setLabel(labels);
+			testMat.setLabel(labelsT);
 			
 
 				System.out.println(trainMat.rowNum());
@@ -153,9 +178,10 @@ public class GradientBoostLearner extends AbstractLearner {
 			    put("test", testMat);
 			  }
 			};
-			int nround = 2;
+			int nround = 2000;
 			Booster booster = XGBoost.train(trainMat, params, nround, watches, null, null);
-			System.out.println(booster.getVersion());
+			float[][] a = booster.predict(trainMat);
+			
 		}
 		catch(Exception e){
 			System.out.println(e);
