@@ -30,6 +30,10 @@ import com.rapidminer.operator.UserError;
 import com.rapidminer.operator.learner.PredictionModel;
 import com.rapidminer.tools.Tools;
 
+import ml.dmlc.xgboost4j.java.Booster;
+import ml.dmlc.xgboost4j.java.DMatrix;
+import ml.dmlc.xgboost4j.java.XGBoostError;
+
 
 /**
  * The model for linear regression.
@@ -64,7 +68,9 @@ public class XGBRegressionModel extends PredictionModel {
 	
 	private String secondClassName = null;
 	
-	public XGBRegressionModel(ExampleSet exampleSet, boolean[] selectedAttributes, double[] coefficients, double[] standardErrors, double[] standardizedCoefficients, double[] tolerances, double[] tStatistics, double[] pValues, boolean useIntercept, String firstClassName, String secondClassName) {
+	private Booster booster = null;
+	
+	public XGBRegressionModel(ExampleSet exampleSet, boolean[] selectedAttributes, double[] coefficients, double[] standardErrors, double[] standardizedCoefficients, double[] tolerances, double[] tStatistics, double[] pValues, boolean useIntercept, String firstClassName, String secondClassName, Booster booster) {
 		super(exampleSet);
 		this.attributeNames = com.rapidminer.example.Tools.getRegularAttributeNames(exampleSet);
 		this.attributeConstructions = com.rapidminer.example.Tools.getRegularAttributeConstructions(exampleSet);
@@ -78,6 +84,7 @@ public class XGBRegressionModel extends PredictionModel {
 		this.useIntercept = useIntercept;
 		this.firstClassName = firstClassName;
 		this.secondClassName = secondClassName;
+		this.booster = booster;
 	}
 	
 	@Override
@@ -90,8 +97,49 @@ public class XGBRegressionModel extends PredictionModel {
 		}
 	
 		
-		for (Example example : exampleSet) {
-			double prediction = 0;
+		
+		int nrow = exampleSet.size();
+        int ncol = exampleSet.getAttributes().size();
+        float[] data = new float[nrow*ncol];
+
+        int k = 0;
+		for (Example example : exampleSet) {			
+		   
+			for (Attribute attr: example.getAttributes()) {
+				
+				Double d = example.getValue(attr);
+			
+				if (d.isNaN()) {
+					System.out.println("NAN!" + k);
+				}
+				data[k++] = (float) example.getValue(attr);
+			}
+
+		}
+
+		float missing = 0.0f;
+		try {
+
+			final DMatrix predictionMat = new DMatrix(data, nrow, ncol, missing);
+			float[][] prediction = this.booster.predict(predictionMat);
+
+			for (Example example : exampleSet) {			
+				   
+				
+				double predictionValue = 0;
+				example.setValue(predictedLabel, predictionValue );
+
+			}
+			
+		} catch (XGBoostError e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		
+//		for (Example example : exampleSet) {
+//			double prediction = 33;
+//			example.setValue(predictedLabel, prediction);
 //			int index = 0;
 //			int attributeCounter = 0;
 //			for (Attribute attribute : attributes) {
@@ -119,7 +167,7 @@ public class XGBRegressionModel extends PredictionModel {
 //			} else {
 //				example.setValue(predictedLabel, prediction);
 //			}	
-		}	
+//		}	
 		return exampleSet;
 	}
 		

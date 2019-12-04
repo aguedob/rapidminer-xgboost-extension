@@ -4,6 +4,7 @@ package com.rapidminer.operator.learner.tree;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import com.rapidminer.example.Attribute;
@@ -18,6 +19,9 @@ import com.rapidminer.operator.learner.AbstractLearner;
 import com.rapidminer.operator.learner.functions.XGBRegressionMethod.XGBRegressionResult;
 import com.rapidminer.operator.ports.InputPort;
 import com.rapidminer.operator.learner.functions.XGBRegressionModel;
+import com.rapidminer.parameter.ParameterType;
+import com.rapidminer.parameter.ParameterTypeDouble;
+import com.rapidminer.parameter.ParameterTypeInt;
 
 import ml.dmlc.xgboost4j.java.Booster;
 import ml.dmlc.xgboost4j.java.DMatrix;
@@ -44,6 +48,8 @@ public class GradientBoostLearner extends AbstractLearner {
      * regression.&quot;
      */
     public static final String PARAMETER_FEATURE_SELECTION = "feature_selection";
+    public static final String PARAMETER_LEARNING_RATE = "learning_rate";
+    public static final String PARAMETER_MAX_DEPTH = "max_depth";
 
     /**
      * The parameter name for &quot;Indicates if the algorithm should try to
@@ -109,9 +115,9 @@ public class GradientBoostLearner extends AbstractLearner {
         
         Map<String, Object> params = new HashMap<String, Object>() {
         	  {
-        	    put("eta", 1.0);
+        	    put("eta", getParameterAsDouble(PARAMETER_LEARNING_RATE));
         	    put("verbosity", 0);
-        	    put("max_depth", 2);
+        	    put("max_depth", getParameterAsInt(PARAMETER_MAX_DEPTH));
         	    put("objective", "reg:squarederror");
         	    put("eval_metric", "rmse");
         	  }
@@ -159,7 +165,7 @@ public class GradientBoostLearner extends AbstractLearner {
 		
 		
 		
-		
+		Booster booster = null;
 		float missing = 0.0f;
 		try {
 			final DMatrix trainMat = new DMatrix(data, nrow, ncol, missing);
@@ -178,9 +184,8 @@ public class GradientBoostLearner extends AbstractLearner {
 			    put("test", testMat);
 			  }
 			};
-			int nround = 2000;
-			Booster booster = XGBoost.train(trainMat, params, nround, watches, null, null);
-			float[][] a = booster.predict(trainMat);
+			int nround = 50;
+			booster = XGBoost.train(trainMat, params, nround, watches, null, null);
 			
 		}
 		catch(Exception e){
@@ -230,9 +235,11 @@ public class GradientBoostLearner extends AbstractLearner {
 		double[] pValues = null;
 		boolean useBias = false;
 		//        return new XGBRegressionModel(exampleSet, result.isUsedAttribute, result.coefficients, standardErrors, standardizedCoefficients, tolerances, tStatistics, pValues, useBias, firstClassName, secondClassName);
-        return new XGBRegressionModel(exampleSet, result.isUsedAttribute, result.coefficients, standardErrors, standardizedCoefficients, tolerances, tStatistics, pValues, useBias, firstClassName, secondClassName);
+        return new XGBRegressionModel(exampleSet, result.isUsedAttribute, result.coefficients, standardErrors, standardizedCoefficients, tolerances, tStatistics, pValues, useBias, firstClassName, secondClassName, booster);
 
 	}
+	
+	
 
     @Override
     public boolean supportsCapability(OperatorCapability capability) {
@@ -246,6 +253,20 @@ public class GradientBoostLearner extends AbstractLearner {
             return true;
         return false;
     }
+    
+    @Override
+	public List<ParameterType> getParameterTypes() {
+    	List<ParameterType> types = super.getParameterTypes(); 
+    	types.add(new ParameterTypeDouble(PARAMETER_LEARNING_RATE, "Step size shrinkage used in update to prevents overfitting. After each boosting step, we can directly get the weights of new features, and eta shrinks the feature weights to make the boosting process more conservative.\n" + 
+    			"\n" + 
+    			"range: [0,1]" , 0, 1, 0.015, false));
+    	types.add(new ParameterTypeInt(PARAMETER_MAX_DEPTH, "Maximum depth of a tree. Increasing this value will make the model more complex and more likely to overfit. 0 is only accepted in lossguided growing policy when tree_method is set as hist and it indicates no limit on depth. Beware that XGBoost aggressively consumes memory when training a deep tree.\n" + 
+    			"\n" + 
+    			"range: [0,∞] (0 is only accepted in lossguided growing policy when tree_method is set as hist)" , 0, Integer.MAX_VALUE, 1, false));
+
+    	return types ;
+	}
+
 
    
 }
