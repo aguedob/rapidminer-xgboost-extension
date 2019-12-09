@@ -6,8 +6,8 @@
          <operator>
          	<name>XGBoost Regressor</name>
             <key>gradient_boost_tree_learner</key>
-            <class>com.rapidminer.operator.learner.tree.GradientBoostLearner</class>
-            <replaces>GradientBoostLearner</replaces>
+            <class>com.rapidminer.operator.learner.tree.XGBoostLearner</class>
+            <replaces>XGBoostLearner</replaces>
          </operator>
       </group>
       </group>

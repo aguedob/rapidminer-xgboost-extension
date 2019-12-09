@@ -38,44 +38,20 @@ import ml.dmlc.xgboost4j.java.XGBoost;
  * 
  * @author Ingo Mierswa
  */
-public class GradientBoostLearner extends AbstractLearner {
+public class XGBoostLearner extends AbstractLearner {
 	
 	
 	private final InputPort testSetInput = getInputPorts().createPort("test set");
 	
-	/**
-     * The parameter name for &quot;The feature selection method used during
-     * regression.&quot;
-     */
-    public static final String PARAMETER_FEATURE_SELECTION = "feature_selection";
+
     public static final String PARAMETER_LEARNING_RATE = "learning_rate";
     public static final String PARAMETER_MAX_DEPTH = "max_depth";
 
-    /**
-     * The parameter name for &quot;Indicates if the algorithm should try to
-     * delete colinear features during the regression.&quot;
-     */
-    public static final String PARAMETER_ELIMINATE_COLINEAR_FEATURES = "eliminate_colinear_features";
-
-    public static final String PARAMETER_USE_BIAS = "use_bias";
-
-    /**
-     * The parameter name for &quot;The minimum tolerance for the removal of
-     * colinear features.&quot;
-     */
-    public static final String PARAMETER_MIN_TOLERANCE = "min_tolerance";
-
-    /**
-     * The parameter name for &quot;The ridge parameter used during ridge
-     * regression.&quot;
-     */
-    public static final String PARAMETER_RIDGE = "ridge";
     
     
 
-	public GradientBoostLearner(OperatorDescription description) {
+	public XGBoostLearner(OperatorDescription description) {
 		super(description);
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override
@@ -87,40 +63,37 @@ public class GradientBoostLearner extends AbstractLearner {
 		// initializing data and parameter values.
         Attribute label = exampleSet.getAttributes().getLabel();
         Attribute workingLabel = label;
-        boolean cleanUpLabel = false;
         String firstClassName = null;
         String secondClassName = null;
         
 //        com.rapidminer.example.Tools.onlyNonMissingValues(exampleSet, "Gradient Boost Regression");
-
-//        boolean useBias = getParameterAsBoolean(PARAMETER_USE_BIAS);
-//        boolean removeColinearAttributes = getParameterAsBoolean(PARAMETER_ELIMINATE_COLINEAR_FEATURES);
-//        double ridge = getParameterAsDouble(PARAMETER_RIDGE);
-//        double minTolerance = getParameterAsDouble(PARAMETER_MIN_TOLERANCE);
-        
+   
 		
         
-     // search all attributes and keep numerical
+        // search all attributes and keep numerical
         int numberOfAttributes = exampleSet.getAttributes().size();
         boolean[] isUsedAttribute = new boolean[numberOfAttributes];
         int counter = 0;
-        String[] attributeNames = new String[numberOfAttributes];
+        String[] featureNames = new String[numberOfAttributes];
         for (Attribute attribute : exampleSet.getAttributes()) {
             isUsedAttribute[counter] = attribute.isNumerical();
-            attributeNames[counter] = attribute.getName();
+            featureNames[counter] = attribute.getName();
             counter++;
         }
         
         
-        
         Map<String, Object> params = new HashMap<String, Object>() {
-        	  {
+
+
+			private static final long serialVersionUID = 1765876987L;
+
+			{
         	    put("eta", getParameterAsDouble(PARAMETER_LEARNING_RATE));
         	    put("verbosity", 0);
         	    put("max_depth", getParameterAsInt(PARAMETER_MAX_DEPTH));
         	    put("objective", "reg:squarederror");
         	    put("eval_metric", "rmse");
-        	  }
+        	}
         };
         
 
@@ -128,20 +101,20 @@ public class GradientBoostLearner extends AbstractLearner {
         
         int nrow = exampleSet.size();
         int ncol = exampleSet.getAttributes().size();
+        int k = 0,j=0;
+
 
         float[] labels = new float[nrow];
-
-        
         float[] data = new float[nrow*ncol];
         
-        int k = 0,j=0;
+        
 		for (Example example : exampleSet) {			
 		   
 			for (Attribute attr: example.getAttributes()) {
 				data[k++] = (float) example.getValue(attr);
 			}
-			//System.out.print("   $" + example.getLabel() + "$   ");
 			labels[j++] = (float) example.getLabel();
+
 		}
 		
 		int nrowT = testSet.size();
@@ -159,7 +132,6 @@ public class GradientBoostLearner extends AbstractLearner {
 			for (Attribute attr: example.getAttributes()) {
 				dataT[kT++] = (float) example.getValue(attr);
 			}
-			//System.out.print("   $" + example.getLabel() + "$   ");
 			labelsT[jT++] = (float) example.getLabel();
 		}
 		
@@ -173,12 +145,12 @@ public class GradientBoostLearner extends AbstractLearner {
 			
 			trainMat.setLabel(labels);
 			testMat.setLabel(labelsT);
-			
-
-				System.out.println(trainMat.rowNum());
-				
+							
 			// Specify a watch list to see model accuracy on data sets
 			Map<String, DMatrix> watches = new HashMap<String, DMatrix>() {
+
+				private static final long serialVersionUID = 198769876L;
+
 			  {
 			    put("train", trainMat);
 			    put("test", testMat);
@@ -213,29 +185,15 @@ public class GradientBoostLearner extends AbstractLearner {
             counter++;
         }
         
-        double labelMean = exampleSet.getStatistics(workingLabel, Statistics.AVERAGE_WEIGHTED);
-        double labelStandardDeviation = Math.sqrt(exampleSet.getStatistics(workingLabel, Statistics.VARIANCE_WEIGHTED));
-
-        int numberOfExamples = exampleSet.size();
-
-        // determine the number of used attributes + 1
-        int numberOfUsedAttributes = 1;
-        for (int i = 0; i < isUsedAttribute.length; i++) {
-            if (isUsedAttribute[i]) {
-                numberOfUsedAttributes++;
-            }
-        }
         
         XGBRegressionResult result = new XGBRegressionResult();
         result.isUsedAttribute = new boolean[] {true,true};
         double[] standardErrors = {5,6};
-        double[] standardizedCoefficients = {3,4};
-    	double[] tolerances = {1,2};
-		double[] tStatistics = null;
-		double[] pValues = null;
-		boolean useBias = false;
-		//        return new XGBRegressionModel(exampleSet, result.isUsedAttribute, result.coefficients, standardErrors, standardizedCoefficients, tolerances, tStatistics, pValues, useBias, firstClassName, secondClassName);
-        return new XGBRegressionModel(exampleSet, result.isUsedAttribute, result.coefficients, standardErrors, standardizedCoefficients, tolerances, tStatistics, pValues, useBias, firstClassName, secondClassName, booster);
+        return new XGBRegressionModel(exampleSet, 
+        		result.isUsedAttribute, 
+        		featureNames,
+        		standardErrors, 
+        		booster);
 
 	}
 	
