@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<operators name="template" version="5.0" docbundle="com/rapidminer/resources/i18n/OperatorsDocTemplate">
+   <group key="modeling">
+   	 <group key="classification_and_regression">
+      <group key="tree_induction">
+         <operator>
+         	<name>XGBoost Regressor</name>
+            <key>gradient_boost_tree_learner</key>
+            <class>com.rapidminer.operator.learner.tree.XGBoostLearner</class>
+            <replaces>XGBoostLearner</replaces>
+         </operator>
+      </group>
+      </group>
+   </group>
+</operators>
