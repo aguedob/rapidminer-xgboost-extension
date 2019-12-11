@@ -1,5 +1,5 @@
-<project name="RapidMiner_Extension_Template" default="install">
-	<description>Build file for the RapidMiner Template extension</description>
+<project name="RapidMiner_XGBoost_Extension" xmlns:ivy="antlib:org.apache.ivy.ant">
+	<description>Build file for the RapidMiner XGBoost extension</description>
 	
 	<presetdef name="javac">
 	    <javac includeantruntime="false" />
@@ -11,7 +11,9 @@
 
 	<property name="build.build" location="build" />
 	<property name="build.resources" location="resources" />
+	<property name="ivy.file" value="ivy.xml"/>
 	<property name="build.lib" location="lib" />
+	
 
 	<property name="check.sources" location = "src" />
 	
@@ -41,6 +43,14 @@
 	<property name="extension.guiDescription" value="/com/rapidminer/resources/i18n/GUITemplate.properties" />
 
 
+	<target name="build" depends="get-dependencies">
+		<antcall target="buildExtension.build" />
+	</target>
+
+	<target name="get-dependencies" description="resolve dependencies with ivy">
+		<ivy:retrieve />
+	</target>
+
 	<!-- Src files -->
 	<path id="build.sources.path">
 		<dirset dir="src">
@@ -53,6 +63,11 @@
 	<fileset id="build.dependentExtensions" dir="..">
 		<exclude name="**/*"/>
 	</fileset>
+
+	<target name="clean-all" depends="clean" description="Additionally purge ivy cache">
+        <ivy:cleancache/>
+    </target>
+	
 
 	<import file="${rm.dir}/build_extension.xml" />
 </project>
