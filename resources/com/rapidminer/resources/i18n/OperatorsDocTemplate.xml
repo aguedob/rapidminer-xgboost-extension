@@ -1,32 +1,10 @@
 <?xml version="1.0" encoding="windows-1252" standalone="no"?>
 <operatorHelp lang="en_EN">
-    <!--  This is an example how to specify the description of operators and the translation of it's key identifier
-    to names. 
-
-   <operator>
-      <name>SingleTextInput</name>
-      <synopsis>Generates word vectors from a single text.</synopsis>
-      <help />
-   </operator>
-   <operator>
-      <name>TextObjectWriter</name>
-      <synopsis>Writes a textobject into a file.</synopsis>
-      <help>This operator writes a given textObject into a file. It might be specified if an existing file with the same name should be overwritten.</help>
-   </operator>
-
-    This is how group ids are translated:
-    
-   <group>
-      <key>text_processing</key>
-      <name>Text Processing</name>
-   </group>
-
-    -->
 
 <operator>
       <name>Extreme Gradient Boosting Regressor</name>
-      <synopsis>This operator learns gradient boost trees from both nominal and numerical data. </synopsis>
-      <help>&lt;p&gt; Extreme Gradient Booosting Regresor based on XGBoost4J library (https://xgboost.readthedocs.io).
+      <synopsis>This operator learns gradient boost trees from both numerical data. </synopsis>
+      <help>Extreme Gradient Booosting Regresor based on XGBoost4J library (https://xgboost.readthedocs.io).
          XGBoost stands for &quot;Extreme Gradient Boosting&quot;, where the term &quot;Gradient Boosting&quot; originates from the paper Greedy Function Approximation: A Gradient Boosting Machine, by Friedman.</help>
       <key>gradient_boost_tree_learner</key>
    </operator>
