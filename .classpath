@@ -10,6 +10,6 @@
 	<classpathentry kind="src" path="src_generated"/>
 	<classpathentry kind="lib" path="/Users/guerrero/Repos/rapidminer-xgboost-extension/lib/xgboost4j-0.90.jar"/>
 	<classpathentry kind="lib" path="/Users/guerrero/Repos/rapidminer-xgboost-extension/lib/kryo-4.0.0.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/RapidMiner"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/Rapidminer"/>
 	<classpathentry kind="output" path="build"/>
 </classpath>

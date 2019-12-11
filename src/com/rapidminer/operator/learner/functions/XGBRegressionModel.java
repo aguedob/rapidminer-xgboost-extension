@@ -71,11 +71,14 @@ public class XGBRegressionModel extends PredictionModel {
 	private Booster booster = null;
 
 	private String[] featureNames;
+
+	private int nrounds;
 	
 	public XGBRegressionModel(ExampleSet exampleSet,
 			boolean[] selectedAttributes, 
 			String[] featureNames,
 			double[] standardErrors, 
+			int nrounds,
 			Booster booster) {
 		
 		super(exampleSet);
@@ -84,6 +87,7 @@ public class XGBRegressionModel extends PredictionModel {
 		this.selectedAttributes = selectedAttributes;
 		this.standardErrors = standardErrors;
 		this.featureNames = featureNames;
+		this.nrounds = nrounds;
 		this.booster = booster;
 	}
 	
@@ -149,10 +153,11 @@ public class XGBRegressionModel extends PredictionModel {
 			for (String featureName : featureScore.keySet())  
 				result.append(featureName + " : " + featureScore.get(featureName) + "\n");
 		} 
-		catch(XGBoostError e) {
+		catch(Exception e) {
 			e.printStackTrace();
 		}
 		return result.toString();
+				
 	}
 	
 

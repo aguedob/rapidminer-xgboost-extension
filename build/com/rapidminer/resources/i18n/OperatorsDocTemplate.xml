@@ -23,4 +23,12 @@
 
     -->
 
+<operator>
+      <name>Extreme Gradient Boosting Regressor</name>
+      <synopsis>This operator learns gradient boost trees from both nominal and numerical data. </synopsis>
+      <help>&lt;p&gt; Extreme Gradient Booosting Regresor based on XGBoost4J library (https://xgboost.readthedocs.io).
+         XGBoost stands for &quot;Extreme Gradient Boosting&quot;, where the term &quot;Gradient Boosting&quot; originates from the paper Greedy Function Approximation: A Gradient Boosting Machine, by Friedman.</help>
+      <key>gradient_boost_tree_learner</key>
+   </operator>
+
 </operatorHelp>
