@@ -46,6 +46,15 @@ public class XGBoostLearner extends AbstractLearner {
 
     public static final String PARAMETER_LEARNING_RATE = "learning_rate";
     public static final String PARAMETER_MAX_DEPTH = "max_depth";
+    public static final String PARAMETER_N_ROUNDS = "n_estimators";
+    public static final String PARAMETER_SUBSAMPLE = "subsample";
+    public static final String PARAMETER_ALPHA = "alpha";
+    public static final String PARAMETER_LAMBDA = "lambda";
+    public static final String PARAMETER_MIN_CHILD_WEIGHT = "min_child_weight";
+    public static final String PARAMETER_COL_SAMPLE_BY_TREE= "colsample_by_tree";
+
+    
+    
 
     
     
@@ -60,11 +69,6 @@ public class XGBoostLearner extends AbstractLearner {
 		
 		ExampleSet testSet = testSetInput.getData(ExampleSet.class);
 		
-		// initializing data and parameter values.
-        Attribute label = exampleSet.getAttributes().getLabel();
-        Attribute workingLabel = label;
-        String firstClassName = null;
-        String secondClassName = null;
         
 //        com.rapidminer.example.Tools.onlyNonMissingValues(exampleSet, "Gradient Boost Regression");
    
@@ -89,10 +93,18 @@ public class XGBoostLearner extends AbstractLearner {
 
 			{
         	    put("eta", getParameterAsDouble(PARAMETER_LEARNING_RATE));
-        	    put("verbosity", 0);
+        	    put("verbosity", 1);
         	    put("max_depth", getParameterAsInt(PARAMETER_MAX_DEPTH));
         	    put("objective", "reg:squarederror");
         	    put("eval_metric", "rmse");
+        	    put("min_child_weight",getParameterAsDouble(PARAMETER_MIN_CHILD_WEIGHT));
+        	    put("alpha",getParameterAsDouble(PARAMETER_ALPHA));
+        	    put("lambda",getParameterAsDouble(PARAMETER_LAMBDA));
+        	    put("subsample",getParameterAsDouble(PARAMETER_SUBSAMPLE));
+    	    	put("colsample_bytree",getParameterAsDouble(PARAMETER_COL_SAMPLE_BY_TREE));
+        	    
+        	    
+        	    
         	}
         };
         
@@ -140,6 +152,7 @@ public class XGBoostLearner extends AbstractLearner {
 		Booster booster = null;
 		float missing = 0.0f;
 		try {
+			
 			final DMatrix trainMat = new DMatrix(data, nrow, ncol, missing);
 			final DMatrix testMat = new DMatrix(dataT, nrowT, ncolT, missing);
 			
@@ -156,12 +169,13 @@ public class XGBoostLearner extends AbstractLearner {
 			    put("test", testMat);
 			  }
 			};
-			int nround = 50;
-			booster = XGBoost.train(trainMat, params, nround, watches, null, null);
-			
+			System.out.println("Training started");
+			booster = XGBoost.train(trainMat, params, getParameterAsInt(PARAMETER_N_ROUNDS) , watches, null, null);		
+			System.out.println("Training finished");
 		}
 		catch(Exception e){
-			System.out.println(e);
+			System.out.println("Training failed!");
+			e.printStackTrace();
 		}
         
         
@@ -192,7 +206,8 @@ public class XGBoostLearner extends AbstractLearner {
         return new XGBRegressionModel(exampleSet, 
         		result.isUsedAttribute, 
         		featureNames,
-        		standardErrors, 
+        		standardErrors,
+        		getParameterAsInt(PARAMETER_N_ROUNDS),
         		booster);
 
 	}
@@ -221,7 +236,22 @@ public class XGBoostLearner extends AbstractLearner {
     	types.add(new ParameterTypeInt(PARAMETER_MAX_DEPTH, "Maximum depth of a tree. Increasing this value will make the model more complex and more likely to overfit. 0 is only accepted in lossguided growing policy when tree_method is set as hist and it indicates no limit on depth. Beware that XGBoost aggressively consumes memory when training a deep tree.\n" + 
     			"\n" + 
     			"range: [0,∞] (0 is only accepted in lossguided growing policy when tree_method is set as hist)" , 0, Integer.MAX_VALUE, 1, false));
-
+    	types.add(new ParameterTypeInt(PARAMETER_N_ROUNDS, "Maximum depth of a tree. Increasing this value will make the model more complex and more likely to overfit. 0 is only accepted in lossguided growing policy when tree_method is set as hist and it indicates no limit on depth. Beware that XGBoost aggressively consumes memory when training a deep tree.\n" + 
+    			"\n" + 
+    			"range: [1,∞] The number of rounds for boosting" , 1, Integer.MAX_VALUE, 1, false));
+    	types.add(new ParameterTypeDouble(PARAMETER_SUBSAMPLE, "Subsample ratio of the training instances. Setting it to 0.5 means that XGBoost would randomly sample half of the training data prior to growing trees. and this will prevent overfitting. Subsampling will occur once in every boosting iteration.\n" + 
+    			"\n" + 
+    			"range: [0,∞] The number of rounds for boosting" , 0, Double.MAX_VALUE, 1, false));
+    	types.add(new ParameterTypeDouble(PARAMETER_ALPHA, "L1 regularization term on weights. Increasing this value will make model more conservative.\n" 
+    			, 0, Double.MAX_VALUE, 0, false));
+    	types.add(new ParameterTypeDouble(PARAMETER_LAMBDA, "L2 regularization term on weights. Increasing this value will make model more conservative.\n" 
+    			, 0, Double.MAX_VALUE, 1, false));
+    	types.add(new ParameterTypeDouble(PARAMETER_MIN_CHILD_WEIGHT, "Minimum sum of instance weight (hessian) needed in a child. If the tree partition step results in a leaf node with the sum of instance weight less than min_child_weight, then the building process will give up further partitioning. In linear regression task, this simply corresponds to minimum number of instances needed to be in each node. The larger min_child_weight is, the more conservative the algorithm will be.\n" + 
+    			"\n" + 
+    			"range: [0,∞] The number of rounds for boosting" , 0, Double.MAX_VALUE, 1, false));
+    	types.add(new ParameterTypeDouble(PARAMETER_COL_SAMPLE_BY_TREE, "colsample_bytree is the subsample ratio of columns when constructing each tree. Subsampling occurs once for every tree constructed.\n" + 
+    			"\n" + 
+    			"range: [0,1] The number of features supplied to a tree" , 0, 1, 1, false));
     	return types ;
 	}
 
