@@ -1,25 +1,4 @@
-/*
- *  RapidMiner
- *
- *  Copyright (C) 2001-2014 by RapidMiner and the contributors
- *
- *  Complete list of developers available at our web site:
- *
- *       http://rapidminer.com
- *
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU Affero General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU Affero General Public License for more details.
- *
- *  You should have received a copy of the GNU Affero General Public License
- *  along with this program.  If not, see http://www.gnu.org/licenses/.
- */
+
 package com.rapidminer.operator.learner.functions;
 
 import java.util.List;
@@ -29,12 +8,7 @@ import com.rapidminer.parameter.ParameterType;
 import com.rapidminer.parameter.UndefinedParameterError;
 
 /**
- * This interface is for all classes that implement an integrated attribute selection
- * algorithm for the {@link LinearRegression} operator.
- * 
- * All subclasses need to have an empty constructor for being built by reflection.
- * 
- * @author Sebastian Land
+ * @author Andres Guerrero
  */
 public interface XGBRegressionMethod {
 

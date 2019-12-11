@@ -29,14 +29,11 @@ import ml.dmlc.xgboost4j.java.XGBoost;
 
 /**
  * <p>
- * This operator calculates a linear regression model. It supports several
- * different mechanisms for model selection: - M5Prime using Akaike criterion
- * for model selection. - A greedy implementation - A T-Test based selection -
- * No selection. Further selections can be added using the static method
+ * This operator calculates a XGBoost regression model.
  * 
  * </p>
  * 
- * @author Ingo Mierswa
+ * @author Andres Guerrerero
  */
 public class XGBoostLearner extends AbstractLearner {
 	
@@ -46,7 +43,7 @@ public class XGBoostLearner extends AbstractLearner {
 
     public static final String PARAMETER_LEARNING_RATE = "learning_rate";
     public static final String PARAMETER_MAX_DEPTH = "max_depth";
-    public static final String PARAMETER_N_ROUNDS = "n_estimators";
+    public static final String PARAMETER_N_ROUNDS = "n_rounds";
     public static final String PARAMETER_SUBSAMPLE = "subsample";
     public static final String PARAMETER_ALPHA = "alpha";
     public static final String PARAMETER_LAMBDA = "lambda";
