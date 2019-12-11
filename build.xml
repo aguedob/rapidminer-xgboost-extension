@@ -5,7 +5,9 @@
 	    <javac includeantruntime="false" />
 	  </presetdef>
 	
-	<property name="rm.dir" location="../rapidminer" />
+
+	<!-- Location for RapidMiner 5 source. Please download it from https://github.com/rapidminer/rapidminer-5 and adjust the location  -->
+	<property name="rm.dir" location="../rapidminer-5" />
 
 	<property name="build.build" location="build" />
 	<property name="build.resources" location="resources" />
