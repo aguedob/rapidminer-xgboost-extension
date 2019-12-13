@@ -66,11 +66,7 @@ public class XGBoostLearner extends AbstractLearner {
 		
 		ExampleSet testSet = testSetInput.getData(ExampleSet.class);
 		
-        
-//        com.rapidminer.example.Tools.onlyNonMissingValues(exampleSet, "Gradient Boost Regression");
-   
-		
-        
+         
         // search all attributes and keep numerical
         int numberOfAttributes = exampleSet.getAttributes().size();
         boolean[] isUsedAttribute = new boolean[numberOfAttributes];
@@ -117,6 +113,8 @@ public class XGBoostLearner extends AbstractLearner {
         float[] data = new float[nrow*ncol];
         
         
+        System.out.println(ncol);
+        
 		for (Example example : exampleSet) {			
 		   
 			for (Attribute attr: example.getAttributes()) {
@@ -145,7 +143,7 @@ public class XGBoostLearner extends AbstractLearner {
 		}
 		
 		
-		
+		String[] evaluationResults = new String[] {};
 		Booster booster = null;
 		float missing = 0.0f;
 		try {
@@ -169,6 +167,8 @@ public class XGBoostLearner extends AbstractLearner {
 			System.out.println("Training started");
 			booster = XGBoost.train(trainMat, params, getParameterAsInt(PARAMETER_N_ROUNDS) , watches, null, null);		
 			System.out.println("Training finished");
+			
+			evaluationResults = XGBoost.crossValidation(trainMat, params, getParameterAsInt(PARAMETER_N_ROUNDS), 5, new String[] {"rmse"} , null, null);
 		}
 		catch(Exception e){
 			System.out.println("Training failed!");
@@ -205,6 +205,7 @@ public class XGBoostLearner extends AbstractLearner {
         		featureNames,
         		standardErrors,
         		getParameterAsInt(PARAMETER_N_ROUNDS),
+        		evaluationResults,
         		booster);
 
 	}

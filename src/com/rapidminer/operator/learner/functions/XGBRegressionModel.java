@@ -55,12 +55,15 @@ public class XGBRegressionModel extends PredictionModel {
 	private String[] featureNames;
 
 	private int nrounds;
+
+	private String[] evaluationResults;
 	
 	public XGBRegressionModel(ExampleSet exampleSet,
 			boolean[] selectedAttributes, 
 			String[] featureNames,
 			double[] standardErrors, 
 			int nrounds,
+			String[] evaluationResults,
 			Booster booster) {
 		
 		super(exampleSet);
@@ -71,6 +74,7 @@ public class XGBRegressionModel extends PredictionModel {
 		this.featureNames = featureNames;
 		this.nrounds = nrounds;
 		this.booster = booster;
+		this.evaluationResults = evaluationResults;
 	}
 	
 	@Override
@@ -130,6 +134,12 @@ public class XGBRegressionModel extends PredictionModel {
 		try {
 
 
+			if (evaluationResults.length>0) {
+				
+				result.append("Evaluation Results:\n");
+				result.append("========================\n");
+				result.append(evaluationResults[evaluationResults.length-1] + "\n\n");
+			}
 			result.append("Feature Score:\n");
 			result.append("========================\n");
 			Map<String,Integer> featureScore = booster.getFeatureScore(featureNames);
